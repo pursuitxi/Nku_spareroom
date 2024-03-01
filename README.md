@@ -1,28 +1,21 @@
 ## Introduction
+A simple tool to check the vacant classrooms in Nku
 
 ## Demo
 ![Demo](./demo/spareroom.gif)
 
-## Usage
-```
-
-
 ```
 ## Options
 ```
-    -g                   grade query
-    -c                   course query
-    -e                   exam query
-    -s                   semester
-    -u                   username
-    -p                   password
-    --elect-course       elect-course
-    -h, --help           guidance
+-a  --area  choose area: a for A or b for B
+-t  --time  choose time: 1~14
+-r  --room  check room
 ```
 
 ## Examples
-    nkueamis -g BCD
-    nkueamis -g ABCDE -u your_username -p your_password
-    nkueamis -c
-    nkueamis -c -s 2016-2017:2
-    nkueamis -e -u your_username -p your_password
+```
+spare
+spare -a A
+spare -t 1
+spare -a A -r 104
+```

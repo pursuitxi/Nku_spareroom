@@ -4,7 +4,7 @@ A simple tool to check the vacant classrooms in Nku
 ## Demo
 ![Demo](./demo/spareroom.gif)
 
-```
+
 ## Options
 ```
 -a  --area  choose area: a for A or b for B

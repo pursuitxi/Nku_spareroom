@@ -14,7 +14,8 @@ cookies = {
     'user_info': '***',
 }
 
-session.cookies = requests.utils.cookiejar_from_dict(cookies, cookiejar=None, overwrite=True)
+with open('cookies.txt','w') as f:
+    f.write(json.dumps(cookies))
 
 headers = {
     'Accept': '*/*',
@@ -43,9 +44,17 @@ Spare = {}
 while True:
     try:
         # 更新cookie
+        file = open('/root/nku/feishu_cookies.txt', 'r')
+        js = file.read()
+        cookies = json.loads(js)
+        session.cookies = requests.utils.cookiejar_from_dict(cookies, cookiejar=None, overwrite=True)
+        
         response = session.post('https://feishu.nankai.edu.cn/Home/Index/refreshInfo', params=params, headers=headers)
         session.cookies.update(session.cookies)
         print(session.cookies)
+         with open('/root/nku/feishu_cookies.txt','w') as f:
+            f.write(json.dumps(requests.utils.dict_from_cookiejar(session.cookies)))
+             
         # 获取数据
         data = {
             'campus': '八里台校区',
@@ -79,18 +88,17 @@ while True:
         today = datetime.today()
         today_of_week = today.weekday() + 1
 
-        Spare[fr'{day_of_week}'] = {'a':a,'b':b}
+        Spare[fr'{today_of_week}'] = {'a':a,'b':b}
         file_path = '/root/nku/spare_classroom.json'
         with open(file_path, 'w') as json_file:
             json_str = json.dumps(Spare)
             json_file.write(json_str)  # 添加一个换行符以确保新的 JSON 数据单独一行
-        time.sleep(540)
+        time.sleep(500)
 
 
     except Exception as e:
 
         send_email('空闲教室获取出错' + f'{e}')
-        with open('/root/nku/feishu_cookie.txt','w') as f:
-            f.write(f'{session.cookies}')
+        
         break
                                               

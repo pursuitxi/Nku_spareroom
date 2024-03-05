@@ -5,6 +5,36 @@ from datetime import datetime
 def pretty_print_list(lst, items_per_line=6):
     for i in range(0, len(lst), items_per_line):
         print('\t' + ' '.join(map(str, lst[i:i+items_per_line])))
+        
+def find_current_phase(schedule):
+    current_time = datetime.now().strftime("%H:%M")
+    closest_phase = None
+    min_difference = float('inf')
+
+    for item in schedule:
+        start_time = item["start"]
+        end_time = item["end"]
+        phase = item["phase"]
+
+        # 计算当前时间与阶段开始时间的差值
+        start_difference = (datetime.strptime(start_time, "%H:%M") - datetime.strptime(current_time, "%H:%M")).total_seconds()
+        # 计算当前时间与阶段结束时间的差值
+        end_difference = (datetime.strptime(end_time, "%H:%M") - datetime.strptime(current_time, "%H:%M")).total_seconds()
+
+        # 如果当前时间在阶段的时间范围内，则直接返回该阶段
+        if start_difference <= 0 <= end_difference:
+            return phase
+        # 如果当前时间比当前最小差值更接近阶段开始时间，则更新最接近阶段的信息
+        elif abs(start_difference) < min_difference:
+            min_difference = abs(start_difference)
+            closest_phase = phase
+        # 如果当前时间比当前最小差值更接近阶段结束时间，则更新最接近阶段的信息
+        elif abs(end_difference) < min_difference:
+            min_difference = abs(end_difference)
+            closest_phase = phase
+
+    return closest_phase
+
 
 parser = argparse.ArgumentParser(description="Spare Classroom:")  # )
 parser.add_argument('-a', '--area', type=str, help=' choose area: a for A or b for B ')
@@ -41,28 +71,7 @@ if args.room is None:
         {"start": "16:55", "end": "17:40", "phase": "10"},
        ]
 
-    # 获取当前时间的小时和分钟
-    current_time = datetime.now().time()
-    current_hour, current_minute = current_time.hour, current_time.minute
-
-    # 将当前时间转换为分钟
-    current_total_minutes = current_hour * 60 + current_minute
-
-    # 判断当前处于哪个阶段
-    current_phase = None
-    for item in schedule:
-        start_time_hour, start_time_minute = map(int, item["start"].split(":"))
-        end_time_hour, end_time_minute = map(int, item["end"].split(":"))
-        start_total_minutes = start_time_hour * 60 + start_time_minute
-        end_total_minutes = end_time_hour * 60 + end_time_minute
-        if start_total_minutes <= current_total_minutes <= end_total_minutes:
-            current_phase = item["phase"]
-            break
-
-    # 如果不处于任何一个阶段，则找出最近的一个阶段
-    if current_phase is None:
-        nearest_phase = min(schedule, key=lambda x: abs(int(x["start"].replace(":", "")) - current_total_minutes))
-        current_phase = nearest_phase["phase"]
+    current_phase = find_current_phase(schedule) 
 
     #====================================================================================
 
